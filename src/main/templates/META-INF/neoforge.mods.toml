@@ -80,14 +80,20 @@ Example mod description.
     side="BOTH"
 
 # Here's another dependency
-[[dependencies.${mod_id}]]
-    modId="minecraft"
-    type="required"
-    # This version range declares a minimum of the current minecraft version up to but not including the next major version
-    versionRange="${minecraft_version_range}"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.examplemod]] # Замените your_mod_id на ваш реальный modId
+    modId="tfmg" # modId TFMG
+    type="required" # или "optional", если не строгая зависимость
+    versionRange="[1.2.2,)" # Укажите подходящий диапазон версий TFMG
+    ordering="BEFORE" # или "BEFORE"/"AFTER" если важен порядок загрузки
+    side="BOTH" # или "CLIENT"/"SERVER" если зависимость только для клиента/сервера
 
+# Here's another dependency
+[[dependencies.examplemod]] # Замените your_mod_id на ваш реальный modId
+    modId="farmersdelight" # modId
+    type="required" # или "optional", если не строгая зависимость
+    versionRange="[1.2.0,)" # Укажите подходящий диапазон версий
+    ordering="BEFORE" # или "BEFORE"/"AFTER" если важен порядок загрузки
+    side="BOTH" # или "CLIENT"/"SERVER" если зависимость только для клиента/сервера
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

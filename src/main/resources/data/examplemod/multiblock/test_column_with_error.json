@@ -1,0 +1,21 @@
+{
+  "id": "examplemod:test_column_with_error",
+
+  "layers ERROR": [
+    { "template": "layer_bottom" },
+    { "template": "layer_top" }
+  ],
+  "templates": {
+    "layer_bottom": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "examplemod:enhanced_blast_furnace_output" },
+        {"id": null, "offset": [0, 1], "base": "examplemod:enhanced_fireproof_bricks" }
+      ]
+    },
+    "layer_top": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "examplemod:enhanced_fireproof_bricks" }
+      ]
+    }
+  }
+}

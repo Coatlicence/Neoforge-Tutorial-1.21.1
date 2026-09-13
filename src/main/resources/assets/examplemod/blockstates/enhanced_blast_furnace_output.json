@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "examplemod:block/enhanced_blast_furnace_output", "y": 0 },
+    "facing=east":  { "model": "examplemod:block/enhanced_blast_furnace_output", "y": 90 },
+    "facing=south": { "model": "examplemod:block/enhanced_blast_furnace_output", "y": 180 },
+    "facing=west":  { "model": "examplemod:block/enhanced_blast_furnace_output", "y": 270 }
+  }
+}

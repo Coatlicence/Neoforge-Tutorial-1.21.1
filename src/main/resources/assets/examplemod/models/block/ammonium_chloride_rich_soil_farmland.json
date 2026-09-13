@@ -1,0 +1,7 @@
+
+{
+  "parent": "farmersdelight:block/rich_soil_farmland",
+  "textures": {
+    "texture": "farmersdelight:block/rich_soil_farmland"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "examplemod:test_column_1",
+
+  "layers": [
+    { "template": "layer_bottom" },
+    { "template": "layer_top", "repeat": { "min": 0, "max": 2 } },
+    { "template": "layer_top_hatch" }
+  ],
+  "templates": {
+    "layer_bottom": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "examplemod:enhanced_blast_furnace_output" },
+        {"id": null, "offset": [0, 1], "base": "examplemod:enhanced_fireproof_bricks" }
+      ]
+    },
+    "layer_top": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "examplemod:enhanced_fireproof_bricks" }
+      ]
+    },
+    "layer_top_hatch": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "examplemod:enhanced_hatch_block" }
+      ]
+    }
+  }
+}

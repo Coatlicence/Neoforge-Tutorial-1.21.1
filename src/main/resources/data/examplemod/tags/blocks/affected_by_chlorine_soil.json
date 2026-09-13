@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:wheat",
+    "farmersdelight:rice_crop",
+    "#forge:crops/grain",
+    "#forge:crops/cereal"
+  ]
+}
