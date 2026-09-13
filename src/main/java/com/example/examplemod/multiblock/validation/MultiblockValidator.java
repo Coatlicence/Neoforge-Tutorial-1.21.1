@@ -1,10 +1,11 @@
-package com.example.examplemod.multiblock;
+package com.example.examplemod.multiblock.validation;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.multiblock.data.Cell;
-import com.example.examplemod.multiblock.data.LayerTemplate;
-import com.example.examplemod.multiblock.data.MultiblockDefinition;
-import com.example.examplemod.multiblock.data.ValidationResult;
+import com.example.examplemod.multiblock.IMultiblockController;
+import com.example.examplemod.multiblock.validation.data.Cell;
+import com.example.examplemod.multiblock.validation.data.LayerTemplate;
+import com.example.examplemod.multiblock.validation.data.MultiblockDefinition;
+import com.example.examplemod.multiblock.validation.data.ValidationResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -44,22 +45,18 @@ public class MultiblockValidator {
     public static ValidationResult validate(Level level, IMultiblockController controller, MultiblockDefinition def) {
 
         if (level == null || level.isClientSide)
-            return new ValidationResult(false, null, null);
+            return new ValidationResult(false, null, null, null);
 
         if (controller == null)
-            return new ValidationResult(false, null, null); // вернуть ошибку требуется контроллер
+            return new ValidationResult(false, null, null, null); // вернуть ошибку требуется контроллер
 
         BlockPos controllerPos = controller.getPosition();
 
         if (def == null)
-            return new ValidationResult(false, controllerPos, null); // Или кинуть исключение, это баг конфигурации
+            return new ValidationResult(false, controllerPos, null, null); // Или кинуть исключение, это баг конфигурации
 
         int currentWorldY = 0;
 
-        ExampleMod.LOGGER.info("--------------------------------------------------------");
-        ExampleMod.LOGGER.info("--------------------------------------------------------");
-        ExampleMod.LOGGER.info("--------------------------------------------------------");
-        ExampleMod.LOGGER.info("Start validation of controller at pos {}", controllerPos);
         for (int i = 0; i < def.layers().size(); i++) {
             var currentLayer = def.layers().get(i);
 
@@ -75,60 +72,19 @@ public class MultiblockValidator {
 
             while (currentLayerRepeatCount < max) {
 
-//                var cells = currentLayerTemplate.cells();
-//
-//                for (Cell current_cell : cells) {
-//                    var offset = current_cell.offset();
-//
-//                    var transformedOffset = transformOffset(offset, controller.getFacing());
-//
-//                    BlockPos pos = controllerPos.offset(transformedOffset[0], i, transformedOffset[1]);
-//
-//                    ExampleMod.LOGGER.info("get BlockPos {} {} {}", transformedOffset[0], i, transformedOffset[1]);
-//
-//                    var blockGet = current_cell.base();
-//
-//                    ExampleMod.LOGGER.info("get this block from cell: {}", blockGet);
-//
-//                    var blockInWorld = level.getBlockState(pos);
-//
-//                    ExampleMod.LOGGER.info("blockInWorld: {}", blockInWorld);
-//
-//                    boolean matches = blockInWorld.is(blockGet);
-//
-//                    ExampleMod.LOGGER.info("matches: {}", matches);
-//
-//                    if (!matches) {
-//                        ExampleMod.LOGGER.info("no match at pos: {}", pos);
-//
-//                        break;
-//                        //return new ValidationResult(false, pos, blockGet);
-//                    }
-//
-//                    currentLayerRepeatCount++;
-//
-//                } // matching for one layer
-
                 var check = checkLayer(level, controllerPos, controller.getFacing(), currentLayerTemplate, currentWorldY);
 
-                ExampleMod.LOGGER.info("for layer {}", currentLayerTemplate);
-                ExampleMod.LOGGER.info("RepeatCount: {}, currentWorldY: {}", currentLayerRepeatCount, currentWorldY);
                 if (check.matched()) {
                     currentLayerRepeatCount++;
                     currentWorldY++;
-
-                    ExampleMod.LOGGER.info("matched");
                 }
                 else if (currentLayerRepeatCount < min) {
+                    String msg = String.format("Слой '%s' ожидался минимум %d раз, получено %d",
+                            currentLayer.template(), min, currentLayerRepeatCount);
 
-                    ExampleMod.LOGGER.info("currentLayerRepeatCount < min = {}", currentLayer.repeat().min());
-                    ExampleMod.LOGGER.info("blockExpected: {} block pos: {}", check.failExpected(), check.failPos());
-
-                    return new ValidationResult(false, check.failPos(), check.failExpected());
+                    return new ValidationResult(false, check.failPos(), check.failExpected(), msg);
                 }
                 else {
-                    ExampleMod.LOGGER.info("break");
-                    ExampleMod.LOGGER.info("blockExpected: {} block pos: {}", check.failExpected(), check.failPos());
                     break; // Достигли минимума, но паттерн сменился. Это легитимная остановка
                 }
             } // while layerCount < max ends here
@@ -147,8 +103,6 @@ public class MultiblockValidator {
 
             BlockState stateInWorld = level.getBlockState(pos);
             Block expectedBlock = cell.base(); // Предполагаем, что base() возвращает Block или совместимый тип
-
-            ExampleMod.LOGGER.info("Checking pos {} | Expected: {} | Found: {}", pos, expectedBlock, stateInWorld.getBlock());
 
             if (!stateInWorld.is(expectedBlock)) {
                 return new LayerCheckResult(false, pos, expectedBlock);

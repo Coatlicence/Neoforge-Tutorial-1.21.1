@@ -1,4 +1,4 @@
-package com.example.examplemod.multiblock.data;
+package com.example.examplemod.multiblock.validation.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

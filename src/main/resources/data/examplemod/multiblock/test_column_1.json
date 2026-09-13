@@ -3,7 +3,7 @@
 
   "layers": [
     { "template": "layer_bottom" },
-    { "template": "layer_top", "repeat": { "min": 0, "max": 2 } },
+    { "template": "layer_top", "repeat": { "min": 1, "max": 3 } },
     { "template": "layer_top_hatch" }
   ],
   "templates": {

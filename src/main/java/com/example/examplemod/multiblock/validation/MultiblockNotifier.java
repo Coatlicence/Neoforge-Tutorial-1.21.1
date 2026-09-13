@@ -1,6 +1,7 @@
-package com.example.examplemod.multiblock;
+package com.example.examplemod.multiblock.validation;
 
 import com.example.examplemod.ExampleMod;
+import com.example.examplemod.multiblock.IMultiblockController;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;

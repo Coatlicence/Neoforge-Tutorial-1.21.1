@@ -4,10 +4,11 @@ import com.example.examplemod.ExampleMod;
 import com.example.examplemod.blockentities.ModBlockEntities;
 
 import com.example.examplemod.multiblock.IMultiblockController;
-import com.example.examplemod.multiblock.MultiblockStructures;
-import com.example.examplemod.multiblock.MultiblockValidator;
-import com.example.examplemod.multiblock.data.MultiblockDefinition;
-import com.example.examplemod.multiblock.data.ValidationResult;
+import com.example.examplemod.multiblock.MultiblockState;
+import com.example.examplemod.multiblock.validation.MultiblockStructures;
+import com.example.examplemod.multiblock.validation.MultiblockValidator;
+import com.example.examplemod.multiblock.validation.data.MultiblockDefinition;
+import com.example.examplemod.multiblock.validation.data.ValidationResult;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 
 import java.util.List;
@@ -32,15 +34,13 @@ import static net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING;
 
 public class EnhancedBlastFurnaceOutputBlockEntity extends BlockEntity implements IHaveGoggleInformation, IMultiblockController {
 
-    private boolean isFormed = false;
     private int detectedHeight = 0;
 
-    // Позиция блока, который нарушает структуру (null если всё ОК)
-    private BlockPos failedPos = null;
+    private final MultiblockState state = new MultiblockState();
 
-    // Геттер для рендерера
-    public BlockPos getFailedPos() {
-        return this.failedPos;
+    @Override
+    public @NotNull MultiblockState getMultiblockState() {
+        return java.util.Objects.requireNonNull(this.state, "MultiblockState не может быть null!");
     }
 
     public EnhancedBlastFurnaceOutputBlockEntity(BlockPos pos, BlockState blockState) {
@@ -68,16 +68,15 @@ public class EnhancedBlastFurnaceOutputBlockEntity extends BlockEntity implement
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath("examplemod", "test_column_1");
         MultiblockDefinition def = MultiblockStructures.get(id);
 
-        boolean wasFormed = this.isFormed;
-        BlockPos oldFailedPos = this.failedPos;
+        boolean wasFormed = this.state.isFormed();
+        BlockPos oldFailedPos = this.state.getFailedPos();
 
         ValidationResult res = MultiblockValidator.validate(level, this, def);
 
-        this.isFormed = res.isValid();
-        this.failedPos = res.isValid() ? null : res.failedPos(); // Запоминаем ошибку
+        state.updateValidationResult(res);
 
-        if (wasFormed != this.isFormed || !java.util.Objects.equals(oldFailedPos, this.failedPos)) {
-            level.setBlock(worldPosition, getBlockState().setValue(FORMED, this.isFormed), Block.UPDATE_CLIENTS);
+        if (wasFormed != state.isFormed() || !java.util.Objects.equals(oldFailedPos, state.getFailedPos())) {
+            level.setBlock(worldPosition, getBlockState().setValue(FORMED, state.isFormed()), Block.UPDATE_CLIENTS);
             setChanged();
 
             // ВАЖНО: Принудительно синхронизируем данные с клиентом,
@@ -91,14 +90,10 @@ public class EnhancedBlastFurnaceOutputBlockEntity extends BlockEntity implement
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         tooltip.add(Component.literal("     §6Усиленная доменная печь"));
-        boolean formed = this.getBlockState().getValue(FORMED);
-        if (formed) {
-            tooltip.add(Component.literal("Статус: §aСобрана"));
-        } else {
-            tooltip.add(Component.literal("Статус: §cРазрушена"));
-            if (this.failedPos != null) {
-                tooltip.add(Component.literal("§7Ошибка в блоке: §f" + this.failedPos.toShortString()));
-            }
+        this.state.addGoggleInformation(tooltip, isPlayerSneaking);
+
+        if (state.isFormed()) {
+            tooltip.add(Component.literal("Высота доменной печи: §6" + this.detectedHeight));
         }
         return true;
     }
@@ -110,31 +105,20 @@ public class EnhancedBlastFurnaceOutputBlockEntity extends BlockEntity implement
     @Override
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        state.saveAdditional(tag, registries);
 
-        tag.putBoolean("Formed", this.isFormed);
         tag.putInt("Height", this.detectedHeight);
 
-        if (this.failedPos != null) {
-            tag.putLong("FailedPos", this.failedPos.asLong());
-        } else {
-            // Явно удаляем, если было, но стало null
-            tag.remove("FailedPos");
-        }
         // TODO: save inv, progress
     }
 
     @Override
     public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        state.loadAdditional(tag, registries);
 
-        this.isFormed = tag.getBoolean("Formed");
         this.detectedHeight = tag.getInt("Height");
 
-        if (tag.contains("FailedPos")) {
-            this.failedPos = BlockPos.of(tag.getLong("FailedPos"));
-        } else {
-            this.failedPos = null;
-        }
         // TODO: load inv, progress
     }
 
@@ -162,7 +146,7 @@ public class EnhancedBlastFurnaceOutputBlockEntity extends BlockEntity implement
         super.onLoad();
 
         if (level != null && !level.isClientSide) {
-            isFormed = getBlockState().getValue(FORMED);
+            state.setFormed(getBlockState().getValue(FORMED));
             // Перепроверка при загрузке чанка на сервере
             revalidateStructure();
         }

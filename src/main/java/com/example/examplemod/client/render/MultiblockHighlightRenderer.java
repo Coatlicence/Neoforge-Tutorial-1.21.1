@@ -39,7 +39,7 @@ public class MultiblockHighlightRenderer {
             ExampleMod.LOGGER.debug("КЛИЕНТ: Наведение на контроллер многоблока на {}", pos);
 
             boolean isFormed = controller.getBlockState().getValue(FORMED);
-            BlockPos failedPos = controller.getFailedPos();
+            BlockPos failedPos = controller.getMultiblockState().getFailedPos();
 
             if (isFormed) {
                 // Структура цела. Не рисуем красную рамку, позволяем отрисоваться стандартной белой.

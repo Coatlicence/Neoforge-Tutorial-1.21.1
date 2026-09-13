@@ -1,10 +1,10 @@
-package com.example.examplemod.multiblock;
+package com.example.examplemod.multiblock.validation;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.multiblock.data.Cell;
-import com.example.examplemod.multiblock.data.LayerReference;
-import com.example.examplemod.multiblock.data.LayerTemplate;
-import com.example.examplemod.multiblock.data.MultiblockDefinition;
+import com.example.examplemod.multiblock.validation.data.Cell;
+import com.example.examplemod.multiblock.validation.data.LayerReference;
+import com.example.examplemod.multiblock.validation.data.LayerTemplate;
+import com.example.examplemod.multiblock.validation.data.MultiblockDefinition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;

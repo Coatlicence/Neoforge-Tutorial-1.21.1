@@ -1,7 +1,7 @@
-package com.example.examplemod.multiblock;
+package com.example.examplemod.multiblock.validation;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.multiblock.data.MultiblockDefinition;
+import com.example.examplemod.multiblock.validation.data.MultiblockDefinition;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;

@@ -2,10 +2,9 @@ package com.example.examplemod;
 
 import com.example.examplemod.block.ModBlocks;
 import com.example.examplemod.blockentities.multiblock.component.EnhancedHatchBlockEntity;
-import com.example.examplemod.blockentities.multiblock.controller.EnhancedBlastFurnaceOutputBlockEntity;
 import com.example.examplemod.blockentities.ModBlockEntities;
 import com.example.examplemod.item.ModItems;
-import com.example.examplemod.multiblock.MultiblockReloadListener;
+import com.example.examplemod.multiblock.validation.MultiblockReloadListener;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.slf4j.Logger;
