@@ -65,7 +65,7 @@ public class EnhancedBlastFurnaceOutputBlockEntity extends BlockEntity implement
             return;
         }
 
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("examplemod", "test_column_1");
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("examplemod", "test_column_2");
         MultiblockDefinition def = MultiblockStructures.get(id);
 
         boolean wasFormed = this.state.isFormed();

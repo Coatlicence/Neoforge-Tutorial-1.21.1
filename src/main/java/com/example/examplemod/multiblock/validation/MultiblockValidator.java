@@ -53,7 +53,7 @@ public class MultiblockValidator {
         BlockPos controllerPos = controller.getPosition();
 
         if (def == null)
-            return new ValidationResult(false, controllerPos, null, null); // Или кинуть исключение, это баг конфигурации
+            return new ValidationResult(false, controllerPos, null, "Контроллер не имеет JSON-определения структуры\n MultiblockDefinition равен null"); // Или кинуть исключение, это баг конфигурации
 
         int currentWorldY = 0;
 
@@ -72,7 +72,7 @@ public class MultiblockValidator {
 
             while (currentLayerRepeatCount < max) {
 
-                var check = checkLayer(level, controllerPos, controller.getFacing(), currentLayerTemplate, currentWorldY);
+                var check = checkLayer(level, controllerPos, controller.getFacing(), currentLayerTemplate, currentWorldY, def);
 
                 if (check.matched()) {
                     currentLayerRepeatCount++;
@@ -96,13 +96,18 @@ public class MultiblockValidator {
     // end of validate
 
     // === Вспомогательный метод проверки одного среза (Y-уровня) ===
-    private static LayerCheckResult checkLayer(Level level, BlockPos controllerPos, Direction facing, LayerTemplate template, int worldY) {
+    private static LayerCheckResult checkLayer(Level level, BlockPos controllerPos, Direction facing, LayerTemplate template, int worldY, MultiblockDefinition def) {
         for (Cell cell : template.cells()) {
             int[] transformed = transformOffset(cell.offset(), facing);
             BlockPos pos = controllerPos.offset(transformed[0], worldY, transformed[1]);
 
             BlockState stateInWorld = level.getBlockState(pos);
-            Block expectedBlock = cell.base(); // Предполагаем, что base() возвращает Block или совместимый тип
+            Block expectedBlock = def.resolveBlock(cell.base());
+
+            if (expectedBlock == null) {
+                // Этого не должно произойти благодаря crossValidate, но для безопасности
+                return new LayerCheckResult(false, pos, null);
+            }
 
             if (!stateInWorld.is(expectedBlock)) {
                 return new LayerCheckResult(false, pos, expectedBlock);

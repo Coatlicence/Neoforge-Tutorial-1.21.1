@@ -1,0 +1,33 @@
+{
+  "id": "examplemod:test_column_2",
+
+  "palette": {
+    "CONTROLLER": "examplemod:enhanced_blast_furnace_output",
+    "BRICK": "examplemod:enhanced_fireproof_bricks",
+    "HATCH": "examplemod:enhanced_hatch_block"
+  },
+
+  "layers": [
+    { "template": "layer_bottom" },
+    { "template": "layer_top", "repeat": { "min": 1, "max": 3 } },
+    { "template": "layer_top_hatch" }
+  ],
+  "templates": {
+    "layer_bottom": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "CONTROLLER" },
+        {"id": null, "offset": [0, 1], "base": "BRICK" }
+      ]
+    },
+    "layer_top": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "BRICK" }
+      ]
+    },
+    "layer_top_hatch": {
+      "cells": [
+        {"id": null, "offset": [0, 0], "base": "HATCH" }
+      ]
+    }
+  }
+}

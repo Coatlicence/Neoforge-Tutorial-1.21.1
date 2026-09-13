@@ -10,7 +10,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public final class MultiblockStructures {
 
@@ -28,24 +30,22 @@ public final class MultiblockStructures {
         Map<Block, AABB> result = new HashMap<>();
 
         for (MultiblockDefinition def : CACHE.values()) {
-            // 1. Вычисляем локальный AABB для этого определения
             AABB localAABB = computeLocalAABB(def);
 
-            // 2. Для каждого типа блока в определении
+            Set<Block> uniqueBlocks = new HashSet<>();
             for (LayerReference layerRef : def.layers()) {
                 LayerTemplate template = def.templates().get(layerRef.template());
-
                 for (Cell cell : template.cells()) {
-                    Block block = cell.base(); // Получаем блок из ячейки
-
-                    // 3. Объединяем по максимуму
-                    AABB existing = result.get(block);
-                    if (existing == null) {
-                        result.put(block, localAABB);
-                    } else {
-                        result.put(block, unionAABB(existing, localAABB));
+                    // Резолвим ключ палитры в Block
+                    Block block = def.resolveBlock(cell.base());
+                    if (block != null) {
+                        uniqueBlocks.add(block);
                     }
                 }
+            }
+
+            for (Block block : uniqueBlocks) {
+                result.merge(block, localAABB, MultiblockStructures::unionAABB);
             }
         }
 
@@ -72,7 +72,7 @@ public final class MultiblockStructures {
         }
 
 
-        ExampleMod.LOGGER.info("DEF: {}, AABB {} {}", def.toString(), maxWidth, maxHeight);
+        ExampleMod.LOGGER.info("DEF: {}, AABB {} {}", def.id(), maxWidth, maxHeight);
         // Симметричный AABB: от -maxWidth до +maxWidth по X и Z, от 0 до maxHeight по Y
         return new AABB(-maxWidth, 0, -maxWidth, maxWidth, maxHeight, maxWidth);
     }
